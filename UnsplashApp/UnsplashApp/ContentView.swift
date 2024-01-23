@@ -21,6 +21,8 @@ let imageURLs: [String] = [
 ]
 
 struct ContentView: View {
+    let api = "https://api.unsplash.com/photos/?client_id="
+    let key = ConfigurationManager.instance.plistDictionnary.clientId
     let columns = [GridItem(.flexible(), spacing: 8), GridItem(.flexible())]
     var body: some View {
         NavigationStack {
@@ -77,4 +79,5 @@ struct ContentView_Previews: PreviewProvider {
 #Preview {
     ContentView()
 }
+
 

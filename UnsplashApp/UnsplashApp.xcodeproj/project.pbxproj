@@ -14,6 +14,9 @@
 		91F10F322B5FF06B00F76DA8 /* UnsplashAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F10F312B5FF06B00F76DA8 /* UnsplashAppTests.swift */; };
 		91F10F3C2B5FF06B00F76DA8 /* UnsplashAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F10F3B2B5FF06B00F76DA8 /* UnsplashAppUITests.swift */; };
 		91F10F3E2B5FF06B00F76DA8 /* UnsplashAppUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F10F3D2B5FF06B00F76DA8 /* UnsplashAppUITestsLaunchTests.swift */; };
+		91F10F4B2B600EE000F76DA8 /* Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F10F4A2B600EE000F76DA8 /* Image.swift */; };
+		91F10F4D2B6012FE00F76DA8 /* PListManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F10F4C2B6012FE00F76DA8 /* PListManager.swift */; };
+		91F10F512B60136F00F76DA8 /* environnement.plist in Resources */ = {isa = PBXBuildFile; fileRef = 91F10F502B60136F00F76DA8 /* environnement.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +47,9 @@
 		91F10F372B5FF06B00F76DA8 /* UnsplashAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UnsplashAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		91F10F3B2B5FF06B00F76DA8 /* UnsplashAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnsplashAppUITests.swift; sourceTree = "<group>"; };
 		91F10F3D2B5FF06B00F76DA8 /* UnsplashAppUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnsplashAppUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		91F10F4A2B600EE000F76DA8 /* Image.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Image.swift; sourceTree = "<group>"; };
+		91F10F4C2B6012FE00F76DA8 /* PListManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PListManager.swift; sourceTree = "<group>"; };
+		91F10F502B60136F00F76DA8 /* environnement.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = environnement.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,6 +102,9 @@
 			children = (
 				91F10F202B5FF06900F76DA8 /* UnsplashAppApp.swift */,
 				91F10F222B5FF06900F76DA8 /* ContentView.swift */,
+				91F10F4A2B600EE000F76DA8 /* Image.swift */,
+				91F10F4C2B6012FE00F76DA8 /* PListManager.swift */,
+				91F10F502B60136F00F76DA8 /* environnement.plist */,
 				91F10F242B5FF06B00F76DA8 /* Assets.xcassets */,
 				91F10F262B5FF06B00F76DA8 /* Preview Content */,
 			);
@@ -232,6 +241,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				91F10F282B5FF06B00F76DA8 /* Preview Assets.xcassets in Resources */,
+				91F10F512B60136F00F76DA8 /* environnement.plist in Resources */,
 				91F10F252B5FF06B00F76DA8 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -257,7 +267,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				91F10F4D2B6012FE00F76DA8 /* PListManager.swift in Sources */,
 				91F10F232B5FF06900F76DA8 /* ContentView.swift in Sources */,
+				91F10F4B2B600EE000F76DA8 /* Image.swift in Sources */,
 				91F10F212B5FF06900F76DA8 /* UnsplashAppApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
