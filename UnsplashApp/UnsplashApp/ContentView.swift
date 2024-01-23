@@ -21,32 +21,69 @@ let imageURLs: [String] = [
 ]
 
 struct ContentView: View {
-    let api = "https://api.unsplash.com/photos/?client_id="
-    let key = ConfigurationManager.instance.plistDictionnary.clientId
-    let columns = [GridItem(.flexible(), spacing: 8), GridItem(.flexible())]
+
+    // Déclaration d'une variable d'état, une fois remplie, elle va modifier la vue
+    @State var imageList: [UnsplashPhoto] = []
+    
+    // Déclaration d'une fonction asynchrone
+    func loadData() async {
+        // Créez une URL avec la clé d'API
+        let url = URL(string: "https://api.unsplash.com/photos?client_id=\(ConfigurationManager.instance.plistDictionnary.clientId)")!
+
+        do {
+            // Créez une requête avec cette URL
+            let request = URLRequest(url: url)
+            
+            // Faites l'appel réseau
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            // Transformez les données en JSON
+            let deserializedData = try JSONDecoder().decode([UnsplashPhoto].self, from: data)
+
+            // Mettez à jour l'état de la vue
+            imageList = deserializedData
+
+        } catch {
+            print("Error: \(error)")
+        }
+    }
+
+    // Créez cette nouvelle structure visuelle
     var body: some View {
-        NavigationStack {
+        VStack {
+            // le bouton va lancer l'appel réseau
+            Button(action: {
+                Task {
+                    await loadData()
+                }
+            }, label: {
+                Text("Load Data")
+            })
             ScrollView {
-                LazyVGrid(columns: columns) {
-                    ForEach(imageURLs, id: \.self){ image in
-                        AsyncImage(url: URL(string: image)) { phase in
-                            if let image = phase.image {
-                                image.centerCropped()
-                                    .frame(height: 150)
-                                    .cornerRadius(12)
+                ScrollView {
+                    LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible())]) {
+                        ForEach(imageURLs, id: \.self){ image in
+                            AsyncImage(url: URL(string: image)) { phase in
+                                if let image = phase.image {
+                                    image.centerCropped()
+                                        .frame(height: 150)
+                                        .cornerRadius(12)
+                                }
                             }
                         }
+                        .frame(height: 150)
+                        .padding(5)
                     }
-                    .frame(height: 150)
-                    .padding(5)
                 }
+                .padding(.horizontal, 12)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .navigationTitle("Feed")
             }
-            .padding(.horizontal, 12)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-            .navigationTitle("Feed")
         }
     }
 }
+
+
 
 
 // Définition d'une extension pour le type SwiftUI 'Image'
