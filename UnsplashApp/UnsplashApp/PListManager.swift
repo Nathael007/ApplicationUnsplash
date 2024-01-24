@@ -22,7 +22,7 @@ class ConfigurationManager {
     internal let plistDictionnary: ConfigData
     
     init() {
-        let url = Bundle.main.url(forResource: "environment", withExtension:"plist")!
+        let url = Bundle.main.url(forResource: "environnement", withExtension:"plist")!
             do {
                 let data = try Data(contentsOf: url)
                 let result = try PropertyListDecoder().decode(ConfigData.self, from: data)

@@ -41,4 +41,11 @@ extension Image {
     }
 }
 
+# 4-Appel-Reseau
 
+## Exercice 2
+
+Expliquez les différences entre ces 3 méthodes :
+async/await : permet une meilleure lisibilité et simplicité dans les opérations asynchrones simples.
+Combine : C'est une bonne option pour les applications nécessitant une programmation réactive, où des flux de données sont fréquemment manipulés.
+completionHandler / GCD :  Un contrôle plus fin pour des scénarios complexes où la gestion manuelle des files d'attente et de la concurrence est nécessaire.

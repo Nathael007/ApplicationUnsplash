@@ -8,15 +8,15 @@
 
 struct UnsplashPhoto: Codable, Identifiable {
     let id: String
-    let slug: String
-    let user: User
-    let url: UnsplashImageUrls
+    let slug: String?
+    let user: User?
+    let urls: UnsplashImageUrls?
 
     enum CodingKeys: String, CodingKey {
         case id
         case slug
         case user
-        case url
+        case urls
     }
 }
 
@@ -43,4 +43,10 @@ struct UnsplashImageUrls: Codable {
         case thumb
     }
 }
+
+
+
+
+
+
 

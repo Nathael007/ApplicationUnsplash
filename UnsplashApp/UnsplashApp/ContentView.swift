@@ -20,69 +20,59 @@ let imageURLs: [String] = [
     "https://images.unsplash.com/photo-1558816280-dee9521ff364?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w1MzYyNDN8MHwxfGFsbHwxMHx8fHx8fDF8fDE3MDM3NTk1NTF8&ixlib=rb-4.0.3&q=80&w=1080"
 ]
 
+
 struct ContentView: View {
 
-    // Déclaration d'une variable d'état, une fois remplie, elle va modifier la vue
-    @State var imageList: [UnsplashPhoto] = []
+    @State private var imageList: [UnsplashPhoto] = []
     
-    // Déclaration d'une fonction asynchrone
+
     func loadData() async {
-        // Créez une URL avec la clé d'API
         let url = URL(string: "https://api.unsplash.com/photos?client_id=\(ConfigurationManager.instance.plistDictionnary.clientId)")!
 
         do {
-            // Créez une requête avec cette URL
             let request = URLRequest(url: url)
-            
-            // Faites l'appel réseau
             let (data, response) = try await URLSession.shared.data(for: request)
-            
-            // Transformez les données en JSON
             let deserializedData = try JSONDecoder().decode([UnsplashPhoto].self, from: data)
 
-            // Mettez à jour l'état de la vue
             imageList = deserializedData
-
         } catch {
             print("Error: \(error)")
         }
     }
 
-    // Créez cette nouvelle structure visuelle
     var body: some View {
-        VStack {
-            // le bouton va lancer l'appel réseau
-            Button(action: {
-                Task {
-                    await loadData()
-                }
-            }, label: {
-                Text("Load Data")
-            })
-            ScrollView {
+        NavigationStack {
+            VStack {
+                Button(action: {
+                    Task {
+                        await loadData()
+                    }
+                }, label: {
+                    Text("Load Data")
+                })
+
                 ScrollView {
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible())]) {
-                        ForEach(imageURLs, id: \.self){ image in
-                            AsyncImage(url: URL(string: image)) { phase in
-                                if let image = phase.image {
+                        ForEach(imageList) { image in
+                            if let unwrappedImage = image.urls?.regular {
+                                AsyncImage(url: URL(string: unwrappedImage)) { image in
                                     image.centerCropped()
-                                        .frame(height: 150)
-                                        .cornerRadius(12)
+                                } placeholder: {
+                                    ProgressView()
                                 }
+                                .frame(height: 150)
+                                .cornerRadius(12)
                             }
                         }
-                        .frame(height: 150)
-                        .padding(5)
                     }
+                    .padding(.horizontal, 12)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .navigationTitle("Feed")
                 }
-                .padding(.horizontal, 12)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .navigationTitle("Feed")
             }
         }
     }
 }
-
 
 
 
