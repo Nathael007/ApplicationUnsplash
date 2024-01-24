@@ -7,27 +7,16 @@
 
 import SwiftUI
 
-let imageURLs: [String] = [
-    "https://images.unsplash.com/photo-1683009427666-340595e57e43?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w1MzYyNDN8MXwxfGFsbHwxfHx8fHx8MXx8MTcwMzc1OTU1MXw&ixlib=rb-4.0.3&q=80&w=1080",
-    "https://images.unsplash.com/photo-1563473213013-de2a0133c100?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w1MzYyNDN8MHwxfGFsbHwyfHx8fHx8MXx8MTcwMzc1OTU1MXw&ixlib=rb-4.0.3&q=80&w=1080",
-    "https://images.unsplash.com/photo-1490349368154-73de9c9bc37c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w1MzYyNDN8MHwxfGFsbHwzfHx8fHx8MXx8MTcwMzc1OTU1MXw&ixlib=rb-4.0.3&q=80&w=1080",
-    "https://images.unsplash.com/photo-1495379572396-5f27a279ee91?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w1MzYyNDN8MHwxfGFsbHw0fHx8fHx8MXx8MTcwMzc1OTU1MXw&ixlib=rb-4.0.3&q=80&w=1080",
-    "https://images.unsplash.com/photo-1560850038-f95de6e715b3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w1MzYyNDN8MHwxfGFsbHw1fHx8fHx8MXx8MTcwMzc1OTU1MXw&ixlib=rb-4.0.3&q=80&w=1080",
-    "https://images.unsplash.com/photo-1695653422715-991ec3a0db7a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w1MzYyNDN8MXwxfGFsbHw2fHx8fHx8MXx8MTcwMzc1OTU1MXw&ixlib=rb-4.0.3&q=80&w=1080",
-    "https://images.unsplash.com/photo-1547327132-5d20850c62b5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w1MzYyNDN8MHwxfGFsbHw3fHx8fHx8MXx8MTcwMzc1OTU1MXw&ixlib=rb-4.0.3&q=80&w=1080",
-    "https://images.unsplash.com/photo-1492724724894-7464c27d0ceb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w1MzYyNDN8MHwxfGFsbHw4fHx8fHx8MXx8MTcwMzc1OTU1MXw&ixlib=rb-4.0.3&q=80&w=1080",
-    "https://images.unsplash.com/photo-1475694867812-f82b8696d610?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w1MzYyNDN8MHwxfGFsbHw5fHx8fHx8MXx8MTcwMzc1OTU1MXw&ixlib=rb-4.0.3&q=80&w=1080",
-    "https://images.unsplash.com/photo-1558816280-dee9521ff364?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w1MzYyNDN8MHwxfGFsbHwxMHx8fHx8fDF8fDE3MDM3NTk1NTF8&ixlib=rb-4.0.3&q=80&w=1080"
-]
-
-
 struct ContentView: View {
-    @State private var imageList: [UnsplashPhoto] = []
-    
-    @StateObject var feedState = FeedState()
+    @StateObject var photoFeedState = FeedState()
+    @StateObject var topicsFeedState = FeedState()
 
-    func loadData() async {
-        await feedState.fetchHomeFeed()
+    func loadPhotoData() async {
+        await photoFeedState.fetchHomeFeed()
+    }
+
+    func loadTopicsData() async {
+        await topicsFeedState.fetchHomeFeed()
     }
 
     var body: some View {
@@ -35,15 +24,58 @@ struct ContentView: View {
             VStack {
                 Button(action: {
                     Task {
-                        await loadData()
+                        await loadPhotoData()
+                        await loadTopicsData()
                     }
                 }, label: {
                     Text("Load Data")
                 })
-
+                ScrollView(.horizontal) {
+                    LazyHStack {
+                        if let feedTopics = topicsFeedState.photosFeed {
+                            ForEach(feedTopics) { topic in
+                                if let unwrappedImageTopics = topic.urls?.regular {
+                                    AsyncImage(url: URL(string: unwrappedImageTopics)) { topic in
+                                        topic.centerCropped()
+                                    } placeholder: {
+                                        if let colorString = topic.color {
+                                            if let unwrappedColor = Color(hex: colorString) {
+                                                RoundedRectangle(cornerRadius: 12)
+                                                    .fill(unwrappedColor)
+                                                    .frame(width: 150)
+                                            } else {
+                                                ProgressView()
+                                                    .frame(width: 150)
+                                            }
+                                        } else {
+                                            ProgressView()
+                                                .frame(width: 150)
+                                        }
+                                    }
+                                    .frame(width: 150)
+                                    .cornerRadius(12)
+                                }
+                                Text(topic.user?.name ?? "")
+                            }
+                        }
+                        else {
+                            ForEach(0..<12) { _ in
+                                Rectangle()
+                                    .redacted(reason: .placeholder)
+                                    .frame(width: 150)
+                                    .cornerRadius(12)
+                                    .foregroundColor(Color.gray.opacity(0.3))
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 12)
+                }
+                .padding(.vertical, 5)
+                .frame(height: 80)
+                
                 ScrollView {
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible())]) {
-                        if let feedPhoto = feedState.homeFeed {
+                        if let feedPhoto = photoFeedState.photosFeed {
                             ForEach(feedPhoto) { image in
                                 if let unwrappedImage = image.urls?.regular {
                                     AsyncImage(url: URL(string: unwrappedImage)) { image in
@@ -88,6 +120,7 @@ struct ContentView: View {
         }
     }
 }
+
 
 extension Color {
     init?(hex: String) {

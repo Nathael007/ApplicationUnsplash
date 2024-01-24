@@ -8,7 +8,8 @@
 import Foundation
 
 class FeedState: ObservableObject {
-    @Published var homeFeed: [UnsplashPhoto]?
+    @Published var photosFeed: [UnsplashPhoto]? = []
+    @Published var topicsFeed: [Topics]? = []
 
     private let unsplashAPI = UnsplashAPI()
     
@@ -20,15 +21,29 @@ class FeedState: ObservableObject {
             let request = URLRequest(url: url!)
             let (data, _) = try await URLSession.shared.data(for: request)
             
-            if let deserializedData = try? JSONDecoder().decode([UnsplashPhoto].self, from: data) {
-                await MainActor.run{
-                    homeFeed = deserializedData
+            do {
+                let decoder = JSONDecoder()
+                let decodedPhotos = try decoder.decode([UnsplashPhoto].self, from: data)
+                await MainActor.run {
+                    photosFeed = decodedPhotos
                 }
-            } else {
-                print("Failed to decode JSON data")
+                print("Photos decoded successfully: \(decodedPhotos)")
+            } catch {
+                print("Error decoding photos: \(error)")
+            }
+            
+            do {
+                let decoder = JSONDecoder()
+                let decodedTopics = try decoder.decode([Topics].self, from: data)
+                await MainActor.run {
+                    topicsFeed = decodedTopics
+                }
+                print("Topics decoded successfully: \(decodedTopics)")
+            } catch {
+                print("Error decoding topics: \(error)")
             }
         } catch {
-            print("Error fetching home feed: \(error)")
+            print("Error fetching feed: \(error)")
         }
     }
 }

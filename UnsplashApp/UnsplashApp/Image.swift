@@ -13,7 +13,6 @@ struct UnsplashPhoto: Codable, Identifiable {
     let user: User?
     let urls: UnsplashImageUrls?
     let color: String?
-    let topic_submissions: Topics
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -21,7 +20,6 @@ struct UnsplashPhoto: Codable, Identifiable {
         case user
         case urls
         case color
-        case topic_submissions
     }
 }
 
@@ -46,23 +44,5 @@ struct UnsplashImageUrls: Codable {
         case regular
         case small
         case thumb
-    }
-}
-
-struct Topics: Codable, Coding {
-    let id: String
-    let Slug: String?
-
-}
-
-struct Links: Codable {
-    let it: String
-    let html: String
-    let photo: String
-
-    enum CodingKeys: String, CodingKey {
-        case it = "self"
-        html
-        photo
     }
 }

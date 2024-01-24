@@ -12,28 +12,43 @@ import Foundation
 struct UnsplashAPI {
     private let scheme = "https"
     private let host = "api.unsplash.com"
-    private let path = "/photos"
+    private let photosPath = "/photos"
+    private let topicsPath = "/topics"
     private let key = ConfigurationManager.instance.plistDictionnary.clientId
         
-    // Construit un objet URLComponents avec la base de l'API Unsplash
+    // Construit un objet URLComponents avec la base de l'API Unsplash pour les photos
     // Et un query item "client_id" avec la clé d'API retrouvée depuis PListManager
-    func unsplashApiBaseUrl() -> URLComponents {
+    func unsplashPhotosBaseUrl() -> URLComponents {
         var components = URLComponents()
         components.scheme = scheme
         components.host = host
-        components.path = path
+        components.path = photosPath
         components.queryItems = [URLQueryItem(name: "client_id", value: key)]
         return components
     }
     
+    func unsplashTopicsBaseUrl() -> URLComponents {
+        var components = URLComponents()
+        components.scheme = scheme
+        components.host = host
+        components.path = topicsPath
+        components.queryItems = [URLQueryItem(name: "client_id", value: key)]
+        return components
+    }
+
     // Par défaut orderBy = "popular" et perPage = 10
     // Lisez la documentation de l'API pour comprendre les paramètres, vous pouvez aussi en ajouter d'autres si vous le souhaitez
-    func feedUrl(orderBy: String = "popular", perPage: Int = 10) -> URL? {
-        var components = unsplashApiBaseUrl()
+    func feedUrl(orderBy: String = "popular", perPage: Int = 10, isPhotos: Bool = true) -> URL? {
+        var components: URLComponents
+        if isPhotos {
+            components = unsplashPhotosBaseUrl()
+        } else {
+            components = unsplashTopicsBaseUrl()
+        }
+        
         components.queryItems?.append(URLQueryItem(name: "order_by", value: orderBy))
         components.queryItems?.append(URLQueryItem(name: "per_page", value: "\(perPage)"))
         
         return components.url
     }
 }
-
