@@ -9,14 +9,9 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject var photoFeedState = FeedState()
-    @StateObject var topicsFeedState = FeedState()
 
     func loadPhotoData() async {
         await photoFeedState.fetchHomeFeed()
-    }
-
-    func loadTopicsData() async {
-        await topicsFeedState.fetchHomeFeed()
     }
 
     var body: some View {
@@ -25,37 +20,38 @@ struct ContentView: View {
                 Button(action: {
                     Task {
                         await loadPhotoData()
-                        await loadTopicsData()
                     }
                 }, label: {
                     Text("Load Data")
                 })
                 ScrollView(.horizontal) {
                     LazyHStack {
-                        if let feedTopics = topicsFeedState.photosFeed {
+                        if let feedTopics = photoFeedState.photosFeed {
                             ForEach(feedTopics) { topic in
-                                if let unwrappedImageTopics = topic.urls?.regular {
-                                    AsyncImage(url: URL(string: unwrappedImageTopics)) { topic in
-                                        topic.centerCropped()
-                                    } placeholder: {
-                                        if let colorString = topic.color {
-                                            if let unwrappedColor = Color(hex: colorString) {
-                                                RoundedRectangle(cornerRadius: 12)
-                                                    .fill(unwrappedColor)
-                                                    .frame(width: 150)
+                                VStack {
+                                    if let unwrappedImageTopics = topic.urls?.regular {
+                                        AsyncImage(url: URL(string: unwrappedImageTopics)) { topic in
+                                            topic.centerCropped()
+                                        } placeholder: {
+                                            if let colorString = topic.color {
+                                                if let unwrappedColor = Color(hex: colorString) {
+                                                    RoundedRectangle(cornerRadius: 12)
+                                                        .fill(unwrappedColor)
+                                                        .frame(width: 150)
+                                                } else {
+                                                    ProgressView()
+                                                        .frame(width: 150)
+                                                }
                                             } else {
                                                 ProgressView()
                                                     .frame(width: 150)
                                             }
-                                        } else {
-                                            ProgressView()
-                                                .frame(width: 150)
                                         }
+                                        .frame(width: 150)
+                                        .cornerRadius(12)
                                     }
-                                    .frame(width: 150)
-                                    .cornerRadius(12)
+                                    Text(topic.user?.name ?? "")
                                 }
-                                Text(topic.user?.name ?? "")
                             }
                         }
                         else {
@@ -71,7 +67,7 @@ struct ContentView: View {
                     .padding(.horizontal, 12)
                 }
                 .padding(.vertical, 5)
-                .frame(height: 80)
+                .frame(height: 100)
                 
                 ScrollView {
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible())]) {
@@ -120,6 +116,7 @@ struct ContentView: View {
         }
     }
 }
+
 
 
 extension Color {
