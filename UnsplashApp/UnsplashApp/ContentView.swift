@@ -22,22 +22,12 @@ let imageURLs: [String] = [
 
 
 struct ContentView: View {
-
     @State private var imageList: [UnsplashPhoto] = []
     
+    @StateObject var feedState = FeedState()
 
     func loadData() async {
-        let url = URL(string: "https://api.unsplash.com/photos?client_id=\(ConfigurationManager.instance.plistDictionnary.clientId)")!
-
-        do {
-            let request = URLRequest(url: url)
-            let (data, response) = try await URLSession.shared.data(for: request)
-            let deserializedData = try JSONDecoder().decode([UnsplashPhoto].self, from: data)
-
-            imageList = deserializedData
-        } catch {
-            print("Error: \(error)")
-        }
+        await feedState.fetchHomeFeed()
     }
 
     var body: some View {
@@ -53,15 +43,40 @@ struct ContentView: View {
 
                 ScrollView {
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible())]) {
-                        ForEach(imageList) { image in
-                            if let unwrappedImage = image.urls?.regular {
-                                AsyncImage(url: URL(string: unwrappedImage)) { image in
-                                    image.centerCropped()
-                                } placeholder: {
-                                    ProgressView()
+                        if let feedPhoto = feedState.homeFeed {
+                            ForEach(feedPhoto) { image in
+                                if let unwrappedImage = image.urls?.regular {
+                                    AsyncImage(url: URL(string: unwrappedImage)) { image in
+                                        image.centerCropped()
+                                    } placeholder: {
+                                        if let colorString = image.color {
+                                            if let unwrappedColor = Color(hex: colorString) {
+                                                RoundedRectangle(cornerRadius: 12)
+                                                    .fill(unwrappedColor)
+                                                    .frame(height: 150)
+                                            } else {
+                                                // Gestion des erreurs lors de la conversion de la couleur
+                                                ProgressView()
+                                                    .frame(height: 150)
+                                            }
+                                        } else {
+                                            // Aucune couleur fournie, affichez le placeholder
+                                            ProgressView()
+                                                .frame(height: 150)
+                                        }
+                                    }
+                                    .frame(height: 150)
+                                    .cornerRadius(12)
                                 }
-                                .frame(height: 150)
-                                .cornerRadius(12)
+                            }
+                        }
+                        else {
+                            ForEach(0..<12) { _ in
+                                Rectangle()
+                                    .redacted(reason: .placeholder)
+                                    .frame(height: 150)
+                                    .cornerRadius(12)
+                                    .foregroundColor(Color.gray.opacity(0.3))
                             }
                         }
                     }
@@ -74,7 +89,24 @@ struct ContentView: View {
     }
 }
 
+extension Color {
+    init?(hex: String) {
+        var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
+        hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
 
+        var rgb: UInt64 = 0
+
+        guard Scanner(string: hexSanitized).scanHexInt64(&rgb) else {
+            return nil
+        }
+
+        self.init(
+            red: Double((rgb & 0xFF0000) >> 16) / 255.0,
+            green: Double((rgb & 0x00FF00) >> 8) / 255.0,
+            blue: Double(rgb & 0x0000FF) / 255.0
+        )
+    }
+}
 
 // Définition d'une extension pour le type SwiftUI 'Image'
 extension Image {
@@ -95,6 +127,7 @@ extension Image {
         }
     }
 }
+
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
